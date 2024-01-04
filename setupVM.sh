@@ -4,6 +4,8 @@
 sudo apt-get update
 sudo apt-get install tmux
 sudo apt-get install git
+sudo apt-get install ranger
+sudo apt-get install python3-venv
 
 # Clone the repository
 git clone 'https://github.com/joshuawe/telegram-journal-bot'

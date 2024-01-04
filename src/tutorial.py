@@ -3,6 +3,7 @@ from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler
 
 import utils
+from incoming_voice import voice
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,9 +22,6 @@ async def caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
-    
-async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="I see, you are sending me an audio message. I am still learning how to process audio messages.")
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(utils.get_telegram_token()).build()
