@@ -5,9 +5,10 @@ Personal Telegram bot for journaling.
 This Telegram bot helps with daily journaling tasks. Typing messages is tedious. So, instead you can send audio messages to your telegram bot and have it transcribe the audio and append it to your digital journal as text.
 
 Current plan:
--[] Set up Google Cloud Platform instance.
--[] Set up Telegram bot via BotFather.
--[] Write simple Telegram bot and run on GCP instance. Testing.
+-[x] Set up Google Cloud Platform instance.
+-[x] Set up Telegram bot via BotFather.
+-[x] Write simple Telegram bot and run locally.
+-[] Run bot on GCP instance.
 Mile stone.
 -[] Figure out how to access voice memos sent to Telegram bot.
 -[] Use Huggingface voice2text functionality to transcribe.

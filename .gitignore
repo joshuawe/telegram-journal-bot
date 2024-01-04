@@ -172,3 +172,5 @@ bot_env/Scripts/pip3.11.exe
 bot_env/Scripts/pip3.exe
 bot_env/Scripts/python.exe
 bot_env/Scripts/pythonw.exe
+tokens.json
+configs.json
