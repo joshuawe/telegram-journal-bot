@@ -2,12 +2,9 @@ from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler
 
 import utils
+import transcribe
 
-async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
-    # send 'not yet implemented' message
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="I see, you are sending me an audio message. I am still learning how to process audio messages.")
-    
+async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):    
 
     # Getting the voice message
     voice_message = update.message.voice
@@ -27,4 +24,20 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await new_file.download_to_drive(save_path)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Audio message received and downloaded.")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Audio message received and downloaded.")
+
+    # Transcribe the audio file
+    transcription = transcribe.transcribe_from_file(save_path)
+    
+    # Check for error
+    if 'error' in transcription.keys():
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {transcription}")       
+        
+        
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=transcription['text'])
+        
+    # save transcription to file
+    transcription_save_path = save_path.parent / f"{file_id}.txt"
+    transcription_save_path.write_text(transcription['text'])
+    

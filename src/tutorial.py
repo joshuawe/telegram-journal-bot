@@ -35,6 +35,8 @@ if __name__ == '__main__':
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
     application.add_handler(unknown_handler)
     voice_handler = MessageHandler(filters.VOICE, voice)
-    application.add_handler(voice_handler)   
+    application.add_handler(voice_handler)
+    audio_handler = MessageHandler(filters.AUDIO, voice)
+    application.add_handler(audio_handler)   
     
     application.run_polling()

@@ -19,3 +19,13 @@ def get_voice_save_path():
     with open(TOKEN_PATH) as token_file:
         voice_save_path = json.load(token_file)['save_paths']['voice_messages']
     return Path(voice_save_path)
+
+def get_huggingface_token():
+    with open(TOKEN_PATH) as token_file:
+        token = json.load(token_file)['huggingface']['token']
+    return token
+
+def get_speech2text_model_name():
+    with open(TOKEN_PATH) as token_file:
+        model_name = json.load(token_file)['huggingface']['speech2text_model_name']
+    return model_name

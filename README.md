@@ -28,16 +28,16 @@ Current plan:
 Mile stone.
 
 -  [x] Figure out how to access voice memos sent to Telegram bot.  
--  [] Use Huggingface voice2text functionality to transcribe.  
+-  [x] Use Huggingface voice2text functionality to transcribe.  
 
 Mile stone.
 
--  [] Any transcriptions should appended in a document.  
--  [] Set up Notion API and access a specific page.  
--  [] Append daily transcriptions to Notion database.  
+-  [ ] Any transcriptions should appended in a document.  
+-  [ ] Set up Notion API and access a specific page.  
+-  [ ] Append daily transcriptions to Notion database.  
 
 Mile stone.
 
--  [] Scaling: Set up for multiple Telegram Bots. -> Multiple journal bots should be able to run on the same computing instance.  
+-  [ ] Scaling: Set up for multiple Telegram Bots. -> Multiple journal bots should be able to run on the same computing instance.  
 
 Mile stone.
