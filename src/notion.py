@@ -102,7 +102,7 @@ class Notion:
         }
         return paragraph_block
     
-    def create_block_header(self, text_to_add: str, heading: Literal['#', '##', '###']='#', text_color: COLORS='red'):
+    def create_block_header(self, text_to_add: str, heading: Literal['#', '##', '###']='#', text_color: COLORS='default'):
         # get the correct heading type
         mapped_headings = dict(zip(['#', '##', '###'], ['heading_1', 'heading_2', 'heading_3']))
         heading = mapped_headings[heading]
