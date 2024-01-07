@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler
 
 import utils
+import notion
 import transcribe
 
 async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):    
@@ -26,7 +29,7 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Audio message received and downloaded.")
 
-    # Transcribe the audio file
+    # --- Transcribe the audio file ---
     transcription = transcribe.transcribe_from_file(save_path)
     
     # Check for error
@@ -41,3 +44,12 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     transcription_save_path = save_path.parent / f"{file_id}.txt"
     transcription_save_path.write_text(transcription['text'])
     
+    # --- append to Notion page ---
+    response = notion.append_transcription(
+        utils.get_notion_token(), 
+        utils.get_notion_database_id(), 
+        utils.get_notion_page_properties(), 
+        transcription
+    )
+    
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Transcription appended to Notion.")

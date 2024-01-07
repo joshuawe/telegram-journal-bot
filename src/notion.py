@@ -1,8 +1,10 @@
+from datetime import datetime
 from typing import Union, List, Literal
-
 from pprint import pprint
 
 from notion_client import Client
+
+import utils
 
 
 class Notion:
@@ -79,7 +81,7 @@ class Notion:
                 
         return pages_info
     
-    def create_block_paragraph(self, text_to_add:str):
+    def create_block_paragraph(self, text_to_add: str):
         # Corrected content structure with rich_text field
         paragraph_block = {
             "object": "block",
@@ -95,7 +97,7 @@ class Notion:
         }
         return paragraph_block
     
-    def create_block_header(self, text_to_add:str, heading:Literal['#', '##', '###'] = '#'):
+    def create_block_header(self, text_to_add: str, heading: Literal['#', '##', '###']='#'):
         # get the correct heading type
         mapped_headings = dict(zip(['#', '##', '###'], ['heading_1', 'heading_2', 'heading_3']))
         heading = mapped_headings[heading]
@@ -120,16 +122,45 @@ class Notion:
             blocks = [blocks]
         response = self.client.blocks.children.append(block_id=page_id, children=blocks)
         return response
+    
+    def create_transcription_block(self, header:str, text:str):
+        # create the header block
+        header_block = self.create_block_header(header, heading='###')
+        # create the paragraph block
+        paragraph_block = self.create_block_paragraph(text)
+        # append the two blocks
+        blocks = [header_block, paragraph_block]
+        return blocks
 
 
+def append_transcription(token: str, database_id: str, page_properties: str, transcription: dict):
+    notion = Notion(token, database_id, page_properties)
+    
+    # create new page
+    # current week number in the form of YYYY-WW
+    week_number = datetime.now().strftime("%Y Week %V")
+    date_time = datetime.now().strftime("%d.%m.%Y %H:%M")  # DD.MM.YYYY HH:MM
+    timezone = datetime.now().strftime("%Z")  # Timezone
+    new_page = notion.create_page_in_database(notion.DATABASE_ID, week_number)
+    new_page_id = new_page['id']
+    # append the transcription to the new page
+    heading = f"Transcription from {date_time} {timezone} - {utils.get_speech2text_model_name()}"
+    text = transcription['text']
+    block = notion.create_transcription_block(heading, text)
+    # append the block to the new page
+    response = notion.add_blocks_to_page(new_page_id, block)
+    return response
 
         
 
-NOTION_TOKEN  = "secret_akufRDBcruwCW8E62hTVvrefbJtpEskd9hOdoDJZpAC"
-DATABASE_ID = "3d23e0e454e04767bb4d4b856b613e0c"
-PAGE_PROPERTIES = ["Title", "Description"]
+if __name__ == "__main__":
+    NOTION_TOKEN  = "secret_akufRDBcruwCW8E62hTVvrefbJtpEskd9hOdoDJZpAC"
+    DATABASE_ID = "3d23e0e454e04767bb4d4b856b613e0c"
+    PAGE_PROPERTIES = ["Title", "Description"]
 
 
-notion = Notion(NOTION_TOKEN, DATABASE_ID, PAGE_PROPERTIES)
-new_page = notion.get_pages_from_database(DATABASE_ID)
+    notion = Notion(NOTION_TOKEN, DATABASE_ID, PAGE_PROPERTIES)
+    # new_page = notion.create_page_in_database(DATABASE_ID, "new new *new*")
+    
+    append_transcription(NOTION_TOKEN, DATABASE_ID, PAGE_PROPERTIES, {'text': 'test text'})
 
