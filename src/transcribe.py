@@ -2,8 +2,11 @@
 import logging
 import json
 from pathlib import Path
+import time
 
 import requests
+from telegram.ext import ContextTypes
+
 
 import utils
 
@@ -11,11 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 
-def transcribe_from_file(filepath: Path):
+async def transcribe_from_file(filepath: Path, context: ContextTypes.DEFAULT_TYPE, chat_id: int):
     
     # get Huggingface API set up
     API_TOKEN = utils.get_huggingface_token()
     model_name = utils.get_speech2text_model_name()
+    RETRIES = utils.get_config()['huggingface']['retries']
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
     API_URL = f"https://api-inference.huggingface.co/models/{model_name}"
     logger.info(f"Transcribing with Huggingface API. Model: {model_name}")
@@ -24,14 +28,23 @@ def transcribe_from_file(filepath: Path):
     with open(filepath, "rb") as f:
         data = f.read()
         
-    # query Huggingface API
-    response = requests.request("POST", API_URL, headers=headers, data=data)
+    n_try=1
+    while n_try <= RETRIES:
+        # query Huggingface API
+        response = requests.request("POST", API_URL, headers=headers, data=data)
+        response = json.loads(response.content.decode("utf-8"))
     
-    result = json.loads(response.content.decode("utf-8"))
+        if 'error' in response.keys() and 'estimated_time' in response.keys():
+            logger.error(f"Error in transcribe_from_file. The Hugginface Inference API request returned: {response}")
+            await context.bot.send_message(chat_id=chat_id, text=f"Error: {response} \n\n**Retrying ({n_try}/{RETRIES})**")
+            # wait for estimated time
+            time.sleep(response['estimated_time'] * 0.5)
+            n_try += 1
+            if n_try > RETRIES:
+                await context.bot.send_message(chat_id=chat_id, text=f"**Retries exhausted.**") 
+        else:
+            break
     
-    if 'error' in result.keys():
-        logger.error(f"Error in transcribe_from_file. The Hugginface Inference API request returned: {result}")
-    
-    return result
+    return response
 
 
