@@ -29,3 +29,8 @@ def get_speech2text_model_name():
     with open(TOKEN_PATH) as token_file:
         model_name = json.load(token_file)['huggingface']['speech2text_model_name']
     return model_name
+
+def get_notion_token():
+    with open(TOKEN_PATH) as token_file:
+        token = json.load(token_file)['notion']['token']
+    return token
