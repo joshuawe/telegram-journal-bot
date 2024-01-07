@@ -6,6 +6,8 @@ from notion_client import Client
 
 import utils
 
+COLORS = Literal['default', 'gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red']
+
 
 class Notion:
     NOTION_TOKEN: str
@@ -81,7 +83,7 @@ class Notion:
                 
         return pages_info
     
-    def create_block_paragraph(self, text_to_add: str):
+    def create_block_paragraph(self, text_to_add: str, text_color: COLORS='default'):
         # Corrected content structure with rich_text field
         paragraph_block = {
             "object": "block",
@@ -91,13 +93,16 @@ class Notion:
                     "type": "text",
                     "text": {
                         "content": text_to_add
+                    },
+                    "annotations": {
+                        "color": text_color
                     }
                 }]
             }
         }
         return paragraph_block
     
-    def create_block_header(self, text_to_add: str, heading: Literal['#', '##', '###']='#'):
+    def create_block_header(self, text_to_add: str, heading: Literal['#', '##', '###']='#', text_color: COLORS='red'):
         # get the correct heading type
         mapped_headings = dict(zip(['#', '##', '###'], ['heading_1', 'heading_2', 'heading_3']))
         heading = mapped_headings[heading]
@@ -110,6 +115,9 @@ class Notion:
                     "type": "text",
                     "text": {
                         "content": text_to_add
+                    },
+                    "annotations": {
+                        "color": text_color
                     }
                 }]
             }
@@ -134,6 +142,25 @@ class Notion:
 
 
 def append_transcription(token: str, database_id: str, page_properties: str, transcription: dict):
+    """
+    Standalone function that appends a transcription to a Notion page, following a specific format.
+
+    Parameters
+    ----------
+    token : str
+        The Notion API token.
+    database_id : str
+        The ID of the database to append the transcription to.
+    page_properties : str
+        The properties of the page to append the transcription to.
+    transcription : dict
+        The transcription to append to the page.
+
+    Returns
+    -------
+    response : dict
+        The response from the Notion API for appending a block.
+    """
     notion = Notion(token, database_id, page_properties)
     
     title = create_page_title()
@@ -145,9 +172,13 @@ def append_transcription(token: str, database_id: str, page_properties: str, tra
     # append the transcription to the new page
     heading, text = get_transcription_heading(), transcription['text']
     print(heading, text)
-    block = notion.create_transcription_block(heading, text)
+    header_block = notion.create_block_header(heading, heading='###')
+    # create the paragraph block
+    paragraph_block = notion.create_block_paragraph(text)
+    # append the two blocks
+    blocks = [header_block, paragraph_block]
     # append the block to the new page
-    response = notion.add_blocks_to_page(page_id, block)
+    response = notion.add_blocks_to_page(page_id, blocks)
     return response
 
 
@@ -177,12 +208,18 @@ def get_page_from_database_by_title(notion:Notion, title:str):
     return False
 
 def create_page_title():
+    """ Return string with format
+            'YYYY Week WW', e.g. '2024 Week 34'
+    """
     return datetime.now().strftime("%Y Week %V")  # current week number YYYY-WW
 
 def get_transcription_heading():
+    """ Return a string in the form of 
+            'Transcription from DD.MM.YYYY HH:MM Timezone', e.g. 'Transcription from 24.08.2021 15:30 CEST'
+    """
     date_time = datetime.now().strftime("%d.%m.%Y %H:%M")  # DD.MM.YYYY HH:MM
     timezone = datetime.now().strftime("%Z")  # Timezone
-    heading = f"Transcription from {date_time} {timezone} - {utils.get_speech2text_model_name()}"
+    heading = f"Transcription from {date_time} {timezone}"
     return heading
 
         

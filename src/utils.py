@@ -3,6 +3,11 @@ from pathlib import Path
 
 TOKEN_PATH = 'configs.json'
 
+def get_config():
+    with open(TOKEN_PATH) as token_file:
+        config = json.load(token_file)
+    return config
+
 def get_telegram_token():
     with open(TOKEN_PATH) as token_file:
         token = json.load(token_file)['telegram']['token']
