@@ -29,3 +29,18 @@ def get_speech2text_model_name():
     with open(TOKEN_PATH) as token_file:
         model_name = json.load(token_file)['huggingface']['speech2text_model_name']
     return model_name
+
+def get_notion_token():
+    with open(TOKEN_PATH) as token_file:
+        token = json.load(token_file)['notion']['token']
+    return token
+
+def get_notion_database_id():
+    with open(TOKEN_PATH) as token_file:
+        database_id = json.load(token_file)['notion']['database_id']
+    return database_id
+
+def get_notion_page_properties():
+    with open(TOKEN_PATH) as token_file:
+        page_properties = json.load(token_file)['notion']['page_properties']
+    return page_properties
