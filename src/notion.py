@@ -136,20 +136,54 @@ class Notion:
 def append_transcription(token: str, database_id: str, page_properties: str, transcription: dict):
     notion = Notion(token, database_id, page_properties)
     
-    # create new page
-    # current week number in the form of YYYY-WW
-    week_number = datetime.now().strftime("%Y Week %V")
-    date_time = datetime.now().strftime("%d.%m.%Y %H:%M")  # DD.MM.YYYY HH:MM
-    timezone = datetime.now().strftime("%Z")  # Timezone
-    new_page = notion.create_page_in_database(notion.DATABASE_ID, week_number)
-    new_page_id = new_page['id']
+    title = create_page_title()
+    # does a page with the current week number already exist?
+    page_id = get_page_from_database_by_title(notion, title)
+    if page_id is False:
+        page = notion.create_page_in_database(notion.DATABASE_ID, title)
+        page_id = page['id']
     # append the transcription to the new page
-    heading = f"Transcription from {date_time} {timezone} - {utils.get_speech2text_model_name()}"
-    text = transcription['text']
+    heading, text = get_transcription_heading(), transcription['text']
+    print(heading, text)
     block = notion.create_transcription_block(heading, text)
     # append the block to the new page
-    response = notion.add_blocks_to_page(new_page_id, block)
+    response = notion.add_blocks_to_page(page_id, block)
     return response
+
+
+def get_page_from_database_by_title(notion:Notion, title:str):
+    """
+    Check if a page with the given title exists in the database and return the page ID.
+
+    Parameters
+    ----------
+    notion : Notion
+        The Notion object where to search.
+    title : str
+        The title of the page to search for.
+
+    Returns
+    -------
+    Union[str, None]
+        If the page exists, return the page ID, otherwise return False.
+    """
+    # get all pages from database
+    pages = notion.get_pages_from_database(notion.DATABASE_ID)
+    # iterate over pages and return the page ID if the title matches
+    for page in pages:
+        if page['name'] == title:
+            return page['id']
+    
+    return False
+
+def create_page_title():
+    return datetime.now().strftime("%Y Week %V")  # current week number YYYY-WW
+
+def get_transcription_heading():
+    date_time = datetime.now().strftime("%d.%m.%Y %H:%M")  # DD.MM.YYYY HH:MM
+    timezone = datetime.now().strftime("%Z")  # Timezone
+    heading = f"Transcription from {date_time} {timezone} - {utils.get_speech2text_model_name()}"
+    return heading
 
         
 
