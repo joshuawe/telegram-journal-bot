@@ -30,7 +30,7 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Audio message received and downloaded.")
 
     # --- Transcribe the audio file ---
-    transcription = transcribe.transcribe_from_file(save_path)
+    transcription = await transcribe.transcribe_from_file(save_path, context, update.effective_chat.id)
     
     # Check for error
     if 'error' in transcription.keys():
@@ -45,11 +45,15 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     transcription_save_path.write_text(transcription['text'])
     
     # --- append to Notion page ---
-    response = notion.append_transcription(
-        utils.get_notion_token(), 
-        utils.get_notion_database_id(), 
-        utils.get_notion_page_properties(), 
-        transcription
-    )
+    try:
+        response = notion.append_transcription(
+            utils.get_notion_token(), 
+            utils.get_notion_database_id(), 
+            utils.get_notion_page_properties(), 
+            transcription
+        )
+    except Exception as e:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Notion Error: {e}")
+        raise e
     
     await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Transcription appended to Notion.")
