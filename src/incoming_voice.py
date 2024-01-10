@@ -60,10 +60,15 @@ async def audio_or_voice(update: Update, context: ContextTypes.DEFAULT_TYPE, aud
         
         
     else:
-        text = transcription['text']
-        text = text if text != "" else " "
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=transcription['text'])
-        
+        # check for empty string
+        text = transcription['text'] if transcription['text'] != "" else " "
+        # check for too long string
+        if len(text) > 4096:  # telegram message char limit
+            for x in range(0, len(text), 4096):
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=text[x:x+4096])
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
     # save transcription to file
     transcription_save_path = save_path.parent / f"{file_id}.txt"
     transcription_save_path.write_text(transcription['text'])
