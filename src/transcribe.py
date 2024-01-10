@@ -50,10 +50,13 @@ async def transcribe_from_file_huggingface(filepath: Path, context: ContextTypes
 
 async def transcribe_from_file_openai(file_path: Path, *args):
     try:
-        transcription = openai_api.transcribe(file_path)
+        print("Transcribing with OpenAI API. transcribe_from_file_openai")
+        open_client = openai_api.OpenAiCLient(utils.get_openai_token())
+        transcription = open_client.transcribe(file_path)
         response = {'text': transcription.text}
     except Exception as e:
         print(e)
+        return {'error': e}
         
     return response
 
