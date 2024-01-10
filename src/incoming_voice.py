@@ -38,10 +38,13 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Check for error
     if 'error' in transcription.keys():
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {transcription}")       
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {transcription}")  
+        raise RuntimeError(f"Error in function {transcribe_from_file}: {transcription}")     
         
         
     else:
+        text = transcription['text']
+        text = text if text != "" else " "
         await context.bot.send_message(chat_id=update.effective_chat.id, text=transcription['text'])
         
     # save transcription to file
