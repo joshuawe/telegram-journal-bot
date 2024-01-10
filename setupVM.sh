@@ -1,3 +1,6 @@
+#!/bin/bash
+# In terminal run to make executable: chmod +x setupVM.sh
+
 # This is the script for setting up the VM for telegram bot
 
 # Install necessary packages
@@ -18,3 +21,4 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
+echo "> Script is done. <"

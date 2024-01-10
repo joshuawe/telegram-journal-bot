@@ -1,4 +1,10 @@
-# Telegram journal bot
+<p align="center">
+  <img src="figures/circular_icon.png" width="150">
+</p>
+
+<div align="center">
+    <h1>VerbalDiary Assistant</h1>
+</div>
 Personal Telegram bot for journaling.
 
 
@@ -7,9 +13,9 @@ This Telegram bot helps with daily journaling tasks. No more typing and self-org
 
 # Workflow
 
-<center>
+<p align="center">
     <img src="figures/schematic.png" width="450">
-</center>
+</p>
 
 - A voice message is recorded on a messaging device and is sent in the chat with the **Telegram Journal Bot**.
 - A Virtual Machine (VM) instance on Google Cloud is permanently running to host the **Telegram Journal Bot**. 
@@ -32,12 +38,12 @@ Mile stone.
 
 Mile stone.
 
-- [ ] Any transcriptions should appended in a document.  
-- [ ] Set up Notion API and access a specific page.  
-- [ ] Append daily transcriptions to Notion database.  
+- [x] Any transcriptions should appended in a document.  
+- [x] Set up Notion API and access a specific page.  
+- [x] Append daily transcriptions to Notion database.  
 
 Mile stone.
 
-- [ ] Scaling: Set up for multiple Telegram Bots. -> Multiple journal bots should be able to run on the same computing instance.  
+- [ ] Scaling: Set up for multiple Telegram users. -> Multiple Users should be able to use the bot.  
 
 Mile stone.
