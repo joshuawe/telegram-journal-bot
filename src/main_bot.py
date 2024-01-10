@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler
 
 import utils
-from incoming_voice import voice
+from incoming_voice import voice, audio
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     application.add_handler(unknown_handler)
     voice_handler = MessageHandler(filters.VOICE, voice)
     application.add_handler(voice_handler)
-    audio_handler = MessageHandler(filters.AUDIO, voice)
+    audio_handler = MessageHandler(filters.AUDIO, audio)
     application.add_handler(audio_handler)   
     
     application.run_polling()

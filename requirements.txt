@@ -3,3 +3,5 @@ requests
 notion-client
 openai
 tenacity
+pydub
+ffmpeg-python
