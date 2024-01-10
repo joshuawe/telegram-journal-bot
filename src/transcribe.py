@@ -9,12 +9,13 @@ from telegram.ext import ContextTypes
 
 
 import utils
+import openai_api
 
 logger = logging.getLogger(__name__)
 
 
 
-async def transcribe_from_file(filepath: Path, context: ContextTypes.DEFAULT_TYPE, chat_id: int):
+async def transcribe_from_file_huggingface(filepath: Path, context: ContextTypes.DEFAULT_TYPE, chat_id: int):
     
     # get Huggingface API set up
     API_TOKEN = utils.get_huggingface_token()
@@ -45,6 +46,15 @@ async def transcribe_from_file(filepath: Path, context: ContextTypes.DEFAULT_TYP
         else:
             break
     
+    return response
+
+async def transcribe_from_file_openai(file_path: Path, *args):
+    try:
+        transcription = openai_api.transcribe(file_path)
+        response = {'text': transcription.text}
+    except Exception as e:
+        print(e)
+        
     return response
 
 
