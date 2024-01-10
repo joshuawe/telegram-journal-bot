@@ -49,3 +49,8 @@ def get_notion_page_properties():
     with open(TOKEN_PATH) as token_file:
         page_properties = json.load(token_file)['notion']['page_properties']
     return page_properties
+
+def get_openai_token():
+    with open(TOKEN_PATH) as token_file:
+        token = json.load(token_file)['openai']['token']
+    return token
