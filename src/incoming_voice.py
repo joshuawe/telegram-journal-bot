@@ -7,7 +7,11 @@ import utils
 import notion
 import transcribe
 
-async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):    
+async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):   
+    
+    # chose which API to use (OpenAI/Hugginface)
+    # transcribe_from_file = transcribe.transcribe_from_file_huggingface 
+    transcribe_from_file = transcribe.transcribe_from_file_openai 
 
     # Getting the voice message
     voice_message = update.message.voice
@@ -30,7 +34,7 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Audio message received and downloaded.")
 
     # --- Transcribe the audio file ---
-    transcription = await transcribe.transcribe_from_file(save_path, context, update.effective_chat.id)
+    transcription = await transcribe_from_file(save_path, context, update.effective_chat.id)
     
     # Check for error
     if 'error' in transcription.keys():
