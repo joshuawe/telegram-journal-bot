@@ -5,6 +5,13 @@ from pathlib import Path
 
 import utils
 
+def create_table(conn, table_name, fields):
+    """Create a table with the given name and fields."""
+    cursor = conn.cursor()
+    fields_str = ', '.join(fields)
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS {table_name} ({fields_str})')
+    conn.commit()
+
 
 def setup_db():
     """
@@ -15,31 +22,16 @@ def setup_db():
     # Connect to SQLite database (creates the file if it doesn't exist)
     conn = sqlite3.connect(db_path)
 
-    # Create a cursor object using the cursor method
-    cursor = conn.cursor()
+    # Define the fields for the Users table
+    db_configs = utils.get_config()['database']
+    USER_FIELDS = db_configs['Users_fields']
+    MESSAGE_FIELDS = db_configs['Messages_fields']
 
     # Create the Users table
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Users (
-        user_id INTEGER PRIMARY KEY,
-        name TEXT,
-        api_token TEXT,
-        last_message DATETIME
-    )
-    ''')
+    create_table(conn, 'Users', USER_FIELDS)
 
     # Create the Messages table
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Messages (
-        message_id INTEGER PRIMARY KEY,
-        user_id INTEGER,
-        message TEXT,
-        word_count INTEGER,
-        message_type TEXT,
-        audio_length INTEGER,
-        FOREIGN KEY(user_id) REFERENCES Users(user_id)
-    )
-    ''')
+    create_table(conn, 'Messages', MESSAGE_FIELDS)
 
     # Commit the changes and close the connection
     conn.commit()

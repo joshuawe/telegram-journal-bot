@@ -1,6 +1,5 @@
 from pathlib import Path
 import logging
-logger = logging.getLogger(__name__)
 
 import openai
 from tenacity import (
@@ -11,6 +10,8 @@ from tenacity import (
 RETRIES = 6
 
 import utils
+
+logger = logging.getLogger(__name__)
 
 class OpenAiCLient():
     
@@ -44,9 +45,9 @@ class OpenAiCLient():
 
 if __name__ == "__main__":
     client = OpenAiCLient(utils.get_openai_token())
-    
+
     audio_file = Path(r"C:\Users\joshu\LRZ_Sync_Share\Joshua\Programming\telegram-journal-bot\voice_messages\AwACAgIAAxkBAAPzZZsmlQjGJ28zg5KNI_aGM3bQ7uoAAuU8AAJhkuBI88yqfcGKZyQ0BA.ogg")
-    
-    transcript = client.transcribe(audio_file)
-    print(transcript)
+
+    result = client.transcribe(audio_file)
+    print(result)
 
