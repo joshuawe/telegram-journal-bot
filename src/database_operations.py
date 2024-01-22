@@ -122,6 +122,7 @@ def user_exists(user_id) -> bool:
 # insert_user(1, 'Alice', 'token123')
 # user = get_user(1)
 # print(user)
+<<<<<<< HEAD
 
 if __name__ == '__main__':
     delete_user(1)
@@ -131,3 +132,5 @@ if __name__ == '__main__':
     insert_message(1, 'Hello world2', 2, 'text', 0.3)
     print(get_user(1))
     print(get_messages_by_user(1))
+=======
+>>>>>>> ad711ad4b987f7faae196f058ad2d0d89ce570d0
