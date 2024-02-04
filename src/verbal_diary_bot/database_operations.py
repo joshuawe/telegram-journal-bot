@@ -35,6 +35,8 @@ This module is intended to be used as a part of the Telegram bot application, fa
 """
 
 import sqlite3
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from . import utils
 
@@ -70,13 +72,20 @@ def update_user(user_id: int, name: str, notion_token: str):
     conn.commit()
     conn.close()
     
-def insert_message(user_id:str, message: str, word_count: str, message_type: str, audio_length: int):
-    """Insert a new message into the Messages table."""
+def insert_message(user_id:str, date:datetime, message: str, word_count: str, message_type: str, audio_length: float) -> int:
+    """
+        Insert a new message into the Messages table.
+        Returns the message_id of the newly inserted message.
+    """
+    date_str = date.strftime('%Y-%m-%d %H:%M:%S %z')
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO Messages (user_id, message, word_count, message_type, audio_length) VALUES (?, ?, ?, ?, ?)', (user_id, message, word_count, message_type, audio_length))
+    cursor.execute('INSERT INTO Messages (user_id, date, message, word_count, message_type, audio_length) VALUES (?, ?, ?, ?, ?, ?)', (user_id, date_str, message, word_count, message_type, audio_length))
+    # get the message_id from the last inserted row
+    message_id = cursor.lastrowid
     conn.commit()
     conn.close()
+    return message_id
     
 def get_message(message_id) -> tuple:
     """Retrieve a message's details by message_id."""
