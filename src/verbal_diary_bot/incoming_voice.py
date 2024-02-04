@@ -4,9 +4,7 @@ from typing import Literal
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler
 
-import utils
-import notion
-import transcribe
+from . import utils, notion, transcribe
 
 async def audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await audio_or_voice(update, context, 'audio')

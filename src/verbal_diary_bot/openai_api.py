@@ -9,7 +9,7 @@ from tenacity import (
 )  # for exponential backoff
 RETRIES = 6
 
-import utils
+from . import utils
 
 logger = logging.getLogger(__name__)
 

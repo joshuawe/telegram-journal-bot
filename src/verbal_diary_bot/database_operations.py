@@ -36,7 +36,7 @@ This module is intended to be used as a part of the Telegram bot application, fa
 
 import sqlite3
 
-import utils
+from . import utils
 
 
 def connect_db():
@@ -45,7 +45,7 @@ def connect_db():
     conn = sqlite3.connect(db_path)
     return conn
 
-def insert_user(user_id, name, notion_token):
+def insert_user(user_id: int, name: str, notion_token: str):
     """Insert a new user into the Users table."""
     conn = connect_db()
     cursor = conn.cursor()
@@ -53,7 +53,7 @@ def insert_user(user_id, name, notion_token):
     conn.commit()
     conn.close()
 
-def get_user(user_id):
+def get_user(user_id: int):
     """Retrieve a user's details by user_id."""
     conn = connect_db()
     cursor = conn.cursor()
@@ -62,7 +62,7 @@ def get_user(user_id):
     conn.close()
     return user_data
 
-def update_user(user_id, name, notion_token):
+def update_user(user_id: int, name: str, notion_token: str):
     """Update a user's information in the Users table."""
     conn = connect_db()
     cursor = conn.cursor()
@@ -70,7 +70,7 @@ def update_user(user_id, name, notion_token):
     conn.commit()
     conn.close()
     
-def insert_message(user_id, message, word_count, message_type, audio_length):
+def insert_message(user_id:str, message: str, word_count: str, message_type: str, audio_length: int):
     """Insert a new message into the Messages table."""
     conn = connect_db()
     cursor = conn.cursor()
@@ -115,6 +115,11 @@ def user_exists(user_id) -> bool:
     conn.close()
     return exists == 1
 
+def get_last_message_of_user(user_id):
+    """Retrieve the last message sent by a user."""
+    messages = get_messages_by_user(user_id)
+    
+
 
 # Similarly, define functions for insert_message, get_message, update_user, delete_user, etc.
 
@@ -122,7 +127,6 @@ def user_exists(user_id) -> bool:
 # insert_user(1, 'Alice', 'token123')
 # user = get_user(1)
 # print(user)
-<<<<<<< HEAD
 
 if __name__ == '__main__':
     delete_user(1)
@@ -132,5 +136,3 @@ if __name__ == '__main__':
     insert_message(1, 'Hello world2', 2, 'text', 0.3)
     print(get_user(1))
     print(get_messages_by_user(1))
-=======
->>>>>>> ad711ad4b987f7faae196f058ad2d0d89ce570d0

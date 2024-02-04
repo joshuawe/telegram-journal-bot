@@ -18,6 +18,9 @@ def setup_db():
     Sets up the database that stores all the user information.
     """
     db_path = Path(utils.get_db_path())
+    # check if the database already exists
+    if db_path.exists():
+        raise FileExistsError(f'Database already exists at {db_path} and would be overwritten. Aborting. If you want to reset the database, delete the file and try again.')
     db_path.parent.mkdir(parents=True, exist_ok=True)
     # Connect to SQLite database (creates the file if it doesn't exist)
     conn = sqlite3.connect(db_path)

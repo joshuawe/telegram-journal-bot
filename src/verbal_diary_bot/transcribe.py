@@ -8,8 +8,7 @@ import requests
 from telegram.ext import ContextTypes
 
 
-import utils
-import openai_api
+from . import utils, openai_api
 
 logger = logging.getLogger(__name__)
 

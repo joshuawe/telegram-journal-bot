@@ -4,7 +4,7 @@ from pprint import pprint
 
 from notion_client import Client
 
-import utils
+from . import utils
 
 COLORS = Literal['default', 'gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red']
 NOTION_PAR_LIM = 2000  # max number of characters in a Notion paragraph block
