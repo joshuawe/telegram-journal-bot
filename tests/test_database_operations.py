@@ -1,7 +1,8 @@
 import unittest
+from datetime import datetime, timedelta
 
-import utils_sys_path
-from src import database_operations as dbops
+# import utils_sys_path
+from verbal_diary_bot import database_operations as dbops
 
 
 USER1 = {'user_id': 999, 'name': 'test_name', 'notion_token': 'test_notion_token'}
@@ -40,9 +41,11 @@ class TestDatabaseOperations(unittest.TestCase):
         # insert the users
         dbops.insert_user(USER1['user_id'], USER1['name'], USER1['notion_token'])
         dbops.insert_user(USER2['user_id'], USER2['name'], USER2['notion_token'])
+        message_date = datetime.now()
+        message_date2 = message_date + timedelta(minutes=2)
         # insert messages
-        dbops.insert_message(USER1['user_id'], 'test_message', 10, 'text', 0)
-        dbops.insert_message(USER1['user_id'], 'test_message2', 10, 'text', 0)
+        dbops.insert_message(USER1['user_id'], message_date, 'test_message', 10, 'audio', 0)
+        dbops.insert_message(USER1['user_id'], message_date2, 'test_message2', 10, 'audio', 0)
         
         
         

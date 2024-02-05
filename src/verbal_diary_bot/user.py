@@ -56,16 +56,26 @@ class User:
         last_message_date = last_message[2]
         last_message_date = datetime.strptime(last_message_date, '%Y-%m-%d %H:%M:%S %z')
         return last_message_date
+    
+    def first_online(self) -> datetime:
+        """Returns the date and time of the user's first message."""
+        user_messages = db.get_messages_by_user(self.user_id)
+        first_message = user_messages[0]
+        first_message_date = first_message[2]
+        first_message_date = datetime.strptime(first_message_date, '%Y-%m-%d %H:%M:%S %z')
+        return first_message_date
 
 
     def get_user_info(self) -> str:
         """
         Get some user data and associated statistics.
         """
-        info_text = " USER INFO ".center(40, "=") + "\n"
+        info_text = " USER INFO ".center(20, "=") + "\n"
         # add basic info (user_id, name, last_message_date, etc.)
         info_text += f"User ID: {self.user_id}\n"
         info_text += f"Name: {self.user_name}\n"
+        first_message_date = self.first_online().strftime('%Y-%m-%d %H:%M:%S')
+        info_text += f"First message date: {self.first_online()}\n"
         last_message_date = self.last_online().strftime('%Y-%m-%d %H:%M:%S')        
         info_text += f"Last message date: {self.last_online()}\n"
         
@@ -83,7 +93,7 @@ class User:
         info_text += f"Average audio length: {avg_audio_length:.1f}s ({avg_audio_length/60:.1f}min)\n"
         info_text += f"Total audio length: {total_audio_length:.1f}s ({total_audio_length/60:.1f}min)\n"
         
-        info_text += "="*40
+        info_text += "="*20
         
         return info_text
 

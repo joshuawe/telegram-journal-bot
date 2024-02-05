@@ -5,10 +5,6 @@ import verbal_diary_bot as vdb
 import verbal_diary_bot.database_operations as dbops
 
 
-import utils_sys_path
-
-
-
 USER1 = {'user_id': 999, 'name': 'test_name', 'notion_token': 'test_notion_token'}
 USER2 = {'user_id': 998, 'name': 'test_name2', 'notion_token': 'test_notion_token2'}
 
@@ -39,7 +35,7 @@ class TestUserClass(unittest.TestCase):
         # get message and check if date is correct
         message = dbops.get_messages_by_user(USER1['user_id'])[-1]
         assert message[1] == USER1['user_id']
-        assert message[2] == date_str
+        assert message[2].strip() == date_str.strip()
         assert message[3] == MESSAGE1['message']
         assert message[4] == MESSAGE1['word_count']
         assert message[5] == MESSAGE1['message_type']
