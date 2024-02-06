@@ -11,6 +11,7 @@ def create_table(conn, table_name, fields):
     fields_str = ', '.join(fields)
     cursor.execute(f'CREATE TABLE IF NOT EXISTS {table_name} ({fields_str})')
     conn.commit()
+    print(f"Created table {table_name} with fields {fields_str}")
 
 
 def setup_db():

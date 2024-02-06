@@ -9,13 +9,35 @@ import verbal_diary_bot as vdb
 from . import utils, notion, transcribe
 
 async def audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle audio messages. These are audio files sent to the chat. This is a wrapper."""
     await audio_or_voice(update, context, 'audio')
     
 async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle voice messages. These are voice messages sent to the chat. This is wrapper."""
     await audio_or_voice(update, context, 'voice')
 
 async def audio_or_voice(update: Update, context: ContextTypes.DEFAULT_TYPE, audio_or_voice: Literal['audio', 'voice']):   
-    
+    """
+    Handle audio or voice messages. Transcribe them, and then store them in the database.
+
+    Parameters
+    ----------
+    update : Update
+        The update object from the Telegram API.
+    context : ContextTypes.DEFAULT_TYPE
+        The context object from the Telegram API.
+    audio_or_voice : Literal['audio', 'voice']
+        Whether it is a voice or audio message. Telegram stores the associated data slightly differently.
+
+    Raises
+    ------
+    ValueError
+        If audio_or_voice is not 'audio' or 'voice'.
+    RuntimeError
+        If an error occurs in the transcription process.
+    e
+        If an error occurs in the Notion append process.
+    """
     # Create the user object
     user_id = update.effective_user.id
     user_name = update.effective_user.username
@@ -82,16 +104,15 @@ async def audio_or_voice(update: Update, context: ContextTypes.DEFAULT_TYPE, aud
     # --- append to Notion page ---
     try:
         response = notion.append_transcription(
-            utils.get_notion_token(), 
-            utils.get_notion_database_id(), 
+            user.get_notion_token(), 
+            user.get_database_id(), 
             utils.get_notion_page_properties(), 
             transcription
         )
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Transcription appended to Notion.")
     except Exception as e:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Notion Error: {e}")
         raise e
-    
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Transcription appended to Notion.")
     
     
     # get message date from update

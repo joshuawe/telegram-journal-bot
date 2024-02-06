@@ -7,25 +7,45 @@ from zoneinfo import ZoneInfo
 from . import database_operations as db
 
 class User:
+    """
+    Holds information about a user and provides methods to interact with the database.
+    
+    Note: to better understand which fields in the table exist, see the `configs.json` file.
+    """
     user_id: str
     last_message_date: datetime
     
     
-    def __init__(self, user_id: str, user_name: Optional[str] = None, notion_token: Optional[str] = None):
+    def __init__(self, user_id: str, user_name: Optional[str] = None, notion_token: Optional[str] = None, notion_database_id: Optional[str] = None):
+        """
+        Initialize a user. If the user does not exist in the database, it will be added. If it does already, it can be updated.
+
+        Parameters
+        ----------
+        user_id : str
+            The user ID determined by the Telegram API.
+        user_name : Optional[str], optional
+            The user name, determined by the Telegram API, by default None
+        notion_token : Optional[str], optional
+            The notion token required to access the correct Notion account, by default None
+        notion_database_id : Optional[str], optional
+            The Notion database ID where the user's messages will be stored, by default None
+        """
         self.user_id = user_id
         self.user_name = user_name
         # does user exist in the database?
         user_exists = db.user_exists(user_id)
         if not user_exists:
             # if not, add user to the database
-            db.insert_user(user_id, user_name, notion_token)
+            db.insert_user(user_id, user_name, notion_token, notion_database_id)
         else:
             # check whether to update or not
             user_data = db.get_user(user_id)
             user_name = user_data[1] if user_name is None else user_name
             notion_token = user_data[2] if notion_token is None else notion_token
-            if (user_name is not None) or (notion_token is not None):
-                db.update_user(user_id, user_name, notion_token)
+            notion_database_id = user_data[3] if notion_database_id is None else notion_database_id
+            if (user_name is not None) or (notion_token is not None) or (notion_database_id is not None):
+                db.update_user(user_id, user_name, notion_token, notion_database_id)
         
     def add_message(self, message: str, word_count: int, message_type: Literal['audio'], audio_length: float, date: Optional[datetime]=None,) -> None:
         """
@@ -100,6 +120,20 @@ class User:
         info_text += "="*20
         
         return info_text
+    
+    def get_notion_token(self) -> str:
+        """
+            Get the user's Notion token.
+        """
+        user_data = db.get_user(self.user_id)
+        return user_data[2]
+    
+    def get_database_id(self) -> str:
+        """
+            Get the user's Notion database ID.
+        """
+        user_data = db.get_user(self.user_id)
+        return user_data[3]
 
 
     def get_messages(self):
