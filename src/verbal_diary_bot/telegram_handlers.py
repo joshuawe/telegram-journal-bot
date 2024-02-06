@@ -1,12 +1,12 @@
-from datetime import datetime
-from typing import Literal
+from datetime import datetime, timedelta
+from typing import Literal, Optional
 
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler
 
-import utils
-import notion
-import transcribe
+import verbal_diary_bot as vdb
+
+from . import utils, notion, transcribe
 
 async def audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await audio_or_voice(update, context, 'audio')
@@ -15,6 +15,12 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await audio_or_voice(update, context, 'voice')
 
 async def audio_or_voice(update: Update, context: ContextTypes.DEFAULT_TYPE, audio_or_voice: Literal['audio', 'voice']):   
+    
+    # Create the user object
+    user_id = update.effective_user.id
+    user_name = update.effective_user.username
+    user = vdb.user.User(user_id, user_name)
+    last_online = user.last_online()
     
     # chose which API to use (OpenAI/Hugginface)
     # transcribe_from_file = transcribe.transcribe_from_file_huggingface 
@@ -86,3 +92,30 @@ async def audio_or_voice(update: Update, context: ContextTypes.DEFAULT_TYPE, aud
         raise e
     
     await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u2705 Transcription appended to Notion.")
+    
+    
+    # get message date from update
+    message_date = update.message.date
+    # add user's message to the database
+    word_count = len(text.split())
+    audio_length = message.duration if audio_or_voice == 'audio' else message.duration
+    user.add_message(text, word_count, 'audio', audio_length, message_date)
+    
+    # send user stats
+    await user_stats(update, context, last_online)
+    
+    
+    
+async def user_stats(update: Update, context: ContextTypes.DEFAULT_TYPE, last_online: Optional[datetime]=None):
+    """
+        Send user statistics if they have not been provided already within the last 24 h.
+    """
+    user_id = update.effective_user.id
+    user = vdb.user.User(user_id)
+    # check if last message is more than 24 hours ago
+    if last_online is None:
+        last_online = user.last_online()
+    now = datetime.now(last_online.tzinfo)
+    elapsed_time = now - last_online
+    if elapsed_time > timedelta(hours=12):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=user.get_user_info())

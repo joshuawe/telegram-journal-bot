@@ -5,3 +5,4 @@ openai
 tenacity
 pydub
 ffmpeg-python
+pytest

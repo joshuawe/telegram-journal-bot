@@ -21,4 +21,10 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Install local package with pip
+pip install -e .
+
+# Create empty database to store user data
+python3 src/database_setup.py
+
 echo "> Script is done. <"
