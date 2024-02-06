@@ -5,7 +5,7 @@ from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTyp
 
 import verbal_diary_bot as vdb
 from verbal_diary_bot import utils
-from verbal_diary_bot.incoming_voice import voice, audio
+from verbal_diary_bot.telegram_handlers import voice, audio
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

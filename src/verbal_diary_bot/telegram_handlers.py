@@ -117,6 +117,5 @@ async def user_stats(update: Update, context: ContextTypes.DEFAULT_TYPE, last_on
         last_online = user.last_online()
     now = datetime.now(last_online.tzinfo)
     elapsed_time = now - last_online
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=elapsed_time_str)
     if elapsed_time > timedelta(hours=12):
         await context.bot.send_message(chat_id=update.effective_chat.id, text=user.get_user_info())

@@ -52,6 +52,8 @@ class User:
     def last_online(self) -> datetime:
         """Returns the date and time of the user's last message."""
         user_messages = db.get_messages_by_user(self.user_id)
+        if len(user_messages) == 0:
+            return datetime.now(ZoneInfo("Europe/Berlin"))
         last_message = user_messages[-1]
         last_message_date = last_message[2]
         last_message_date = datetime.strptime(last_message_date, '%Y-%m-%d %H:%M:%S %z')
@@ -60,6 +62,8 @@ class User:
     def first_online(self) -> datetime:
         """Returns the date and time of the user's first message."""
         user_messages = db.get_messages_by_user(self.user_id)
+        if len(user_messages) == 0:
+            return datetime.now(ZoneInfo("Europe/Berlin"))
         first_message = user_messages[0]
         first_message_date = first_message[2]
         first_message_date = datetime.strptime(first_message_date, '%Y-%m-%d %H:%M:%S %z')
