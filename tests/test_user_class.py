@@ -5,8 +5,8 @@ import verbal_diary_bot as vdb
 import verbal_diary_bot.database_operations as dbops
 
 
-USER1 = {'user_id': 999, 'name': 'test_name', 'notion_token': 'test_notion_token'}
-USER2 = {'user_id': 998, 'name': 'test_name2', 'notion_token': 'test_notion_token2'}
+USER1 = {'user_id': 999, 'name': 'test_name', 'notion_token': 'test_notion_token', 'database_id': '843756384563489'}
+USER2 = {'user_id': 998, 'name': 'test_name2', 'notion_token': 'test_notion_token2', 'database_id': '843756384564389'}
 
 MESSAGE1 = {'message': 'test message', 'word_count': 2, 'message_type': 'audio', 'audio_length': 23}
 MESSAGE2 = {'message': 'Here we are talking many more words.', 'word_count': 32, 'message_type': 'audio', 'audio_length': 36}
@@ -15,11 +15,21 @@ class TestUserClass(unittest.TestCase):
     def setUp(self) -> None:
         dbops.delete_user(USER1['user_id'])
     
+    def test_user_exists(self):
+        """Test if user exists."""
+        assert not dbops.user_exists(USER2['user_id'])
+        dbops.insert_user(USER1['user_id'], USER1['name'], USER1['notion_token'], USER1['database_id'])
+        assert dbops.user_exists(USER1['user_id'])
+        dbops.delete_user(USER1['user_id'])
+        assert not dbops.user_exists(USER1['user_id'])
+        
+
     def test_new_user(self):
         """Test creating a new user."""
         user = vdb.user.User(USER1['user_id'], USER1['name'], USER1['notion_token'])
         assert user.user_id == USER1['user_id']
         assert dbops.user_exists(USER1['user_id'])
+        
     
         
     def test_add_message(self):

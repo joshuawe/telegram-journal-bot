@@ -47,11 +47,11 @@ def connect_db():
     conn = sqlite3.connect(db_path)
     return conn
 
-def insert_user(user_id: int, name: str, notion_token: str):
+def insert_user(user_id: int, name: str, notion_token: str, database_id: str):
     """Insert a new user into the Users table."""
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO Users (user_id, name, notion_token) VALUES (?, ?, ?)', (user_id, name, notion_token))
+    cursor.execute('INSERT INTO Users (user_id, name, notion_token, database_id) VALUES (?, ?, ?, ?)', (user_id, name, notion_token, database_id))
     conn.commit()
     conn.close()
 
@@ -64,11 +64,11 @@ def get_user(user_id: int):
     conn.close()
     return user_data
 
-def update_user(user_id: int, name: str, notion_token: str):
+def update_user(user_id: int, name: str, notion_token: str, database_id: str):
     """Update a user's information in the Users table."""
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute('UPDATE Users SET name = ?, notion_token = ? WHERE user_id = ?', (name, notion_token, user_id))
+    cursor.execute('UPDATE Users SET name = ?, notion_token = ?, database_id = ? WHERE user_id = ?', (name, notion_token, database_id, user_id))
     conn.commit()
     conn.close()
     

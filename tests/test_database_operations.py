@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from verbal_diary_bot import database_operations as dbops
 
 
-USER1 = {'user_id': 999, 'name': 'test_name', 'notion_token': 'test_notion_token'}
-USER2 = {'user_id': 998, 'name': 'test_name2', 'notion_token': 'test_notion_token2'}
+USER1 = {'user_id': 999, 'name': 'test_name', 'notion_token': 'test_notion_token', 'database_id': '843756384563489'}
+USER2 = {'user_id': 998, 'name': 'test_name2', 'notion_token': 'test_notion_token2', 'database_id': '003756384564389'}
 
 class TestDatabaseOperations(unittest.TestCase):
     def test_connect_db(self):
@@ -17,7 +17,7 @@ class TestDatabaseOperations(unittest.TestCase):
     def test_insert_delete_user(self):
 
         # insert the user
-        dbops.insert_user(USER1['user_id'], USER1['name'], USER1['notion_token'])
+        dbops.insert_user(USER1['user_id'], USER1['name'], USER1['notion_token'], USER1['database_id'])
         # check if user exists
         assert dbops.user_exists(USER1['user_id'])
         # check if user details are correct    
@@ -25,13 +25,15 @@ class TestDatabaseOperations(unittest.TestCase):
         assert user_data[0] == USER1['user_id']
         assert user_data[1] == USER1['name']
         assert user_data[2] == USER1['notion_token']
+        assert user_data[3] == USER1['database_id']
         # update the user
-        dbops.update_user(USER1['user_id'], USER2['name'], USER2['notion_token'])
+        dbops.update_user(USER1['user_id'], USER2['name'], USER2['notion_token'], USER2['database_id'])
         # check if user details are correct
         user_data = dbops.get_user(USER1['user_id'])
         assert user_data[0] == USER1['user_id']
         assert user_data[1] == USER2['name']
         assert user_data[2] == USER2['notion_token']
+        assert user_data[3] == USER2['database_id']
         # delete the user
         dbops.delete_user(USER1['user_id'])
         # check if user exists
@@ -39,8 +41,8 @@ class TestDatabaseOperations(unittest.TestCase):
         
     def test_user_messages(self):
         # insert the users
-        dbops.insert_user(USER1['user_id'], USER1['name'], USER1['notion_token'])
-        dbops.insert_user(USER2['user_id'], USER2['name'], USER2['notion_token'])
+        dbops.insert_user(USER1['user_id'], USER1['name'], USER1['notion_token'], USER1['database_id'])
+        dbops.insert_user(USER2['user_id'], USER2['name'], USER2['notion_token'], USER2['database_id'])
         message_date = datetime.now()
         message_date2 = message_date + timedelta(minutes=2)
         # insert messages
