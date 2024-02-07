@@ -37,8 +37,9 @@ This module is intended to be used as a part of the Telegram bot application, fa
 import sqlite3
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import random
 
-from . import utils
+from verbal_diary_bot import utils
 
 
 def connect_db():
@@ -64,6 +65,15 @@ def get_user(user_id: int):
     conn.close()
     return user_data
 
+def get_all_users() -> list:
+    """Retrieve all users from the Users table."""
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Users')
+    user_data = cursor.fetchall()
+    conn.close()
+    return user_data
+
 def update_user(user_id: int, name: str, notion_token: str, database_id: str):
     """Update a user's information in the Users table."""
     conn = connect_db()
@@ -72,7 +82,7 @@ def update_user(user_id: int, name: str, notion_token: str, database_id: str):
     conn.commit()
     conn.close()
     
-def insert_message(user_id:str, date:datetime, message: str, word_count: str, message_type: str, audio_length: float) -> int:
+def insert_message(user_id:int, date:datetime, message: str, word_count: str, message_type: str, audio_length: float) -> int:
     """
         Insert a new message into the Messages table.
         Returns the message_id of the newly inserted message.
@@ -96,7 +106,16 @@ def get_message(message_id) -> tuple:
     conn.close()
     return message_data
 
-def get_messages_by_user(user_id) -> list:
+def get_all_messages() -> list:
+    """Retrieve all messages from the Messages table."""
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Messages')
+    message_data = cursor.fetchall()
+    conn.close()
+    return message_data
+
+def get_messages_by_user(user_id: int) -> list:
     """Retrieve all messages sent by a user."""
     conn = connect_db()
     cursor = conn.cursor()
@@ -105,12 +124,30 @@ def get_messages_by_user(user_id) -> list:
     conn.close()
     return message_data
 
-def delete_user(user_id):
+def delete_user(user_id: int) -> None:
     """Delete a user's record from the Users and Messages table."""
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM Users WHERE user_id = ?', (user_id,))
     cursor.execute('DELETE FROM Messages WHERE user_id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+def anonymize_user(user_id: int) -> None:
+    """Anonymize a user's record in the Users and Messages table."""
+    conn = connect_db()
+    cursor = conn.cursor()
+    # cursor.execute('DELETE FROM Users WHERE user_id = ?', (user_id,))
+    # cursor.execute('DELETE FROM Messages WHERE user_id = ?', (user_id,))
+    # delete notion token and database id
+    cursor.execute('UPDATE Users SET name = NULL, notion_token = NULL, database_id = NULL WHERE user_id = ?', (user_id,))
+    # set all entries of message in Message table of the user to NULL
+    cursor.execute('UPDATE Messages SET message = NULL WHERE user_id = ?', (user_id,))
+    
+    random_user_id = int(f"999{random.randint(1000000000, 9999999999)}")
+    # change user_id to a randomly generated number of 10 digits in both tables
+    cursor.execute('UPDATE Users SET user_id = ? WHERE user_id = ?', (random_user_id, user_id))
+    cursor.execute('UPDATE Messages SET user_id = ? WHERE user_id = ?', (random_user_id, user_id))
     conn.commit()
     conn.close()
 
@@ -128,20 +165,20 @@ def get_last_message_of_user(user_id):
     """Retrieve the last message sent by a user."""
     messages = get_messages_by_user(user_id)
     
-
-
-# Similarly, define functions for insert_message, get_message, update_user, delete_user, etc.
-
-# Example of usage
-# insert_user(1, 'Alice', 'token123')
-# user = get_user(1)
-# print(user)
+    
+    
 
 if __name__ == '__main__':
-    delete_user(1)
-    insert_user(1, 'Barabara', 'woeufhruihreifhrf')
-    update_user(1, 'Barabara', 'woeufhruihreifhrf')
-    insert_message(1, 'Hello world', 2, 'text', 0.1)
-    insert_message(1, 'Hello world2', 2, 'text', 0.3)
-    print(get_user(1))
-    print(get_messages_by_user(1))
+    # print all user information
+    all_users = get_all_users()
+    print(" All users ".center(20, "="))
+    for user in all_users:
+        print(user)
+        
+        
+    # print all message information
+    all_messages = get_all_messages()
+    print("\n", " All messages ".center(20, "="))
+    for message in all_messages:
+        print(message)
+        

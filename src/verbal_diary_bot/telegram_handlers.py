@@ -1,13 +1,16 @@
 from datetime import datetime, timedelta
 from typing import Literal, Optional
+import logging
 
-from telegram import Update
-from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler
 
 
 import verbal_diary_bot as vdb
 
-from . import utils, notion, transcribe
+from verbal_diary_bot import utils, notion, transcribe
+
+logger = logging.getLogger(__name__)
 
 async def audio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle audio messages. These are audio files sent to the chat. This is a wrapper."""
@@ -253,21 +256,21 @@ async def database_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_name = update.effective_user.username
     notion_database_id = update.message.text.strip()
     user = vdb.user.User(user_id, user_name, _api_key, notion_database_id)
-    await update.message.reply_text("Thank you for registering. You can now send voice messages.")
+    await update.message.reply_text(u"\u2705" + " Thank you for registering. You can now send voice messages.")
     _api_key = None
     return ConversationHandler.END  # This ends the conversation
 
-def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global _api_key
     _api_key = None
     user = update.message.from_user
     print(f"User {user.first_name} canceled the conversation.")
-    update.message.reply_text('Registration cancelled.')
+    await update.message.reply_text('Registration cancelled.')
     return ConversationHandler.END
 
 
 
-user_registration_handler = ConversationHandler(
+register_handler = ConversationHandler(
         entry_points=[CommandHandler('register', start_registration)],
         states={
             PRIVACY: [MessageHandler(filters.TEXT & ~filters.COMMAND, privacy)],
@@ -276,3 +279,82 @@ user_registration_handler = ConversationHandler(
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
+
+
+
+
+""" ----------------------------------------------------------------
+                        /deregister User
+        This is part of an interactive session in the Telegram 
+        chat. It will register a new user and ask a few quest-
+        ions.
+    ----------------------------------------------------------------
+"""
+CONFIRM_DEREGISTER, FINAL_CONFIRMATION, CANCEL = range(3)
+
+# async def deregister(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     user_id = update.effective_user.id
+#     user_name = update.effective_user.username
+#     user = vdb.user.User(user_id, user_name)
+#     context.bot.send_message(chat_id=update.effective_chat.id, text="You are deregistered.")
+    
+async def deregister(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("Yes", callback_data='yes'),
+        InlineKeyboardButton("No", callback_data='no')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text('Do you really want to deregister?', reply_markup=reply_markup)
+    return CONFIRM_DEREGISTER
+
+    
+async def confirm_deregister(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    if query.data == 'yes':
+        keyboard = [
+            [InlineKeyboardButton("Yes", callback_data='final_yes'),
+            InlineKeyboardButton("No", callback_data='final_no')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(text="Are you sure you want to deregister? This action cannot be undone.", reply_markup=reply_markup)
+        return FINAL_CONFIRMATION
+    else:
+        return CANCEL
+
+
+async def final_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    if query.data == 'final_yes':
+        # Perform deregistration logic here
+        vdb.user.anonymize_user_from_database(update.effective_user.id)
+        print('User deleted!')  # Replace this with actual deregistration code
+        await query.edit_message_text(text=u"\u2705" + " You have been deregistered.")
+        return ConversationHandler.END
+    else:
+        return CANCEL
+
+async def cancel_deregister(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user, id = update.effective_user.name, update.effective_user.id
+    logger.info(f"User {user} (id: {id}) canceled the conversation.")
+    # emoji green checkmark
+    emoji = u"\u2705"
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=u"\u274C" + ' Deregistration cancelled.')
+    # await update.message.reply_text(u"\u274C" + ' Deregistration cancelled.')
+    return ConversationHandler.END
+
+    
+    
+    
+
+deregister_handler = ConversationHandler(
+    entry_points=[CommandHandler('deregister', deregister)],
+    states={
+        CONFIRM_DEREGISTER: [CallbackQueryHandler(confirm_deregister)],
+        FINAL_CONFIRMATION: [CallbackQueryHandler(final_confirmation)],
+        CANCEL: [CallbackQueryHandler(cancel_deregister)],
+    },
+    fallbacks=[CommandHandler('cancel', cancel_deregister)],
+    # per_message=True
+)

@@ -106,16 +106,20 @@ class User:
         # number of messages sent
         user_messages = db.get_messages_by_user(self.user_id)
         num_messages = len(user_messages)
-        avg_word_count = sum([message[4] for message in user_messages]) / num_messages
-        total_word_count = sum([message[4] for message in user_messages])
-        avg_audio_length = sum([message[6] for message in user_messages]) / num_messages
-        total_audio_length = sum([message[6] for message in user_messages])
-        
-        info_text += f"Number of messages sent: {num_messages}\n"
-        info_text += f"Average word count: {avg_word_count:.1f}\n"
-        info_text += f"Total word count: {total_word_count}\n"
-        info_text += f"Average audio length: {avg_audio_length:.1f}s ({avg_audio_length/60:.1f}min)\n"
-        info_text += f"Total audio length: {total_audio_length:.1f}s ({total_audio_length/60:.1f}min)\n"
+        if num_messages == 0:
+            info_text += "No messages sent yet.\n"
+            info_text += "="*20
+        else:
+            avg_word_count = sum([message[4] for message in user_messages]) / num_messages
+            total_word_count = sum([message[4] for message in user_messages])
+            avg_audio_length = sum([message[6] for message in user_messages]) / num_messages
+            total_audio_length = sum([message[6] for message in user_messages])
+            
+            info_text += f"Number of messages sent: {num_messages}\n"
+            info_text += f"Average word count: {avg_word_count:.1f}\n"
+            info_text += f"Total word count: {total_word_count}\n"
+            info_text += f"Average audio length: {avg_audio_length:.1f}s ({avg_audio_length/60:.1f}min)\n"
+            info_text += f"Total audio length: {total_audio_length:.1f}s ({total_audio_length/60:.1f}min)\n"
         
         info_text += "="*20
         
@@ -139,3 +143,23 @@ class User:
     def get_messages(self):
         user_messages = db.get_messages_by_user(self.user_id)
         return user_messages
+    
+    
+def anonymize_user_from_database(user_id: str) -> str:
+    """
+    Delete a user from the database.
+    
+    Returns:
+    --------
+    str
+        User info and history.
+    """
+    # First check if user is even in the database
+    if not db.user_exists(user_id):
+        return "User does not exist in the database."
+    
+    user = User(user_id)
+    user_history = user.get_user_info()
+    db.anonymize_user(user_id)
+    
+    return user_history
