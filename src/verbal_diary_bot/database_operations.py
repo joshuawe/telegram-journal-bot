@@ -124,8 +124,17 @@ def get_messages_by_user(user_id: int) -> list:
     conn.close()
     return message_data
 
-def delete_user(user_id: int):
+def delete_user(user_id: int) -> None:
     """Delete a user's record from the Users and Messages table."""
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM Users WHERE user_id = ?', (user_id,))
+    cursor.execute('DELETE FROM Messages WHERE user_id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+def anonymize_user(user_id: int) -> None:
+    """Anonymize a user's record in the Users and Messages table."""
     conn = connect_db()
     cursor = conn.cursor()
     # cursor.execute('DELETE FROM Users WHERE user_id = ?', (user_id,))
@@ -156,14 +165,8 @@ def get_last_message_of_user(user_id):
     """Retrieve the last message sent by a user."""
     messages = get_messages_by_user(user_id)
     
-
-
-# Similarly, define functions for insert_message, get_message, update_user, delete_user, etc.
-
-# Example of usage
-# insert_user(1, 'Alice', 'token123')
-# user = get_user(1)
-# print(user)
+    
+    
 
 if __name__ == '__main__':
     # print all user information

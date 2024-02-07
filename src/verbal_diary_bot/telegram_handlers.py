@@ -328,7 +328,7 @@ async def final_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     if query.data == 'final_yes':
         # Perform deregistration logic here
-        vdb.user.delete_user_from_database(update.effective_user.id)
+        vdb.user.anonymize_user_from_database(update.effective_user.id)
         print('User deleted!')  # Replace this with actual deregistration code
         await query.edit_message_text(text=u"\u2705" + " You have been deregistered.")
         return ConversationHandler.END

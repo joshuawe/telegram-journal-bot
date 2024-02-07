@@ -145,7 +145,7 @@ class User:
         return user_messages
     
     
-def delete_user_from_database(user_id: str) -> str:
+def anonymize_user_from_database(user_id: str) -> str:
     """
     Delete a user from the database.
     
@@ -160,6 +160,6 @@ def delete_user_from_database(user_id: str) -> str:
     
     user = User(user_id)
     user_history = user.get_user_info()
-    db.delete_user(user_id)
+    db.anonymize_user(user_id)
     
     return user_history
