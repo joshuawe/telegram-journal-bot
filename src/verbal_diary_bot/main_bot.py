@@ -5,7 +5,7 @@ from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTyp
 
 import verbal_diary_bot as vdb
 from verbal_diary_bot import utils
-from verbal_diary_bot.telegram_handlers import voice, audio, user_registration_handler
+from verbal_diary_bot.telegram_handlers import voice, audio, register_handler, deregister_handler
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -34,7 +34,9 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(utils.get_telegram_token()).build()
     
     # add user registration handler
-    application.add_handler(user_registration_handler)
+    application.add_handler(register_handler)
+    # add user deregistration handler
+    application.add_handler(deregister_handler)
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
     echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
