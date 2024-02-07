@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Literal, Optional
 import logging
+import random
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler
@@ -165,11 +166,76 @@ def is_user_registered(func):
 
 
 
+""" ----------------------------------------------------------------
+                        Echo Messages  
+        User messages should be responded with, if a user is not
+        registered already.
+    ----------------------------------------------------------------
+"""
 
-
-
-
-
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # check if user already exists
+    user_id = update.effective_user.id
+    user_exists = vdb.database_operations.user_exists(user_id)
+    if not user_exists:
+        await update.message.reply_text("You are not registered. Please register first.\nUse the command /register.")
+    else:
+        replies = [
+            "I am a bot, I cannot understand you.",
+            "You do know how this works?",
+            "Just send me a voice message.",
+            "You can also send me audio files.",
+            "I am not sure what you want from me.",
+            "You are already registered. To deregister use the command /deregister.",
+            "My task is to transcribe your voice messages and add them to your notebook.",
+            "How is this experience going for you?",
+            "I would love to receive feedback from you.",
+            "I am here to assist you in your daily life."
+            "You want to journal and keep a diary, right? I see, it can be very tedious to write everything down. This is where I can assist you. You send me a voice message, whenever you feel like it and from wherever you are. Then I transcribe your message ans send you the transcription. In addition, I also store your transcription with your digital notes.",
+            "Does audio-journaling work better for you than writing?",
+            "Did audio-jounrnaling replace your writing journal?",
+            "Do you feel more comfortable with audio-journaling?",
+            "Do you also have the impression that audio-journaling is more personal? <i>It is less formal,  while one has less time to reflect on how to formulate sentences in way that others would be able to understand / relate to on the other side it seems that less thought is spent to write text where one is not <i>judged.</i>",
+            "Do you feel that you are able to express yourself better through audio-journaling?",
+            "Careful when audio-journaling in public. <i>Some people feel uncomfortable talking about their inner world and their opinions or judgements if there are potential listeners, even if they are strangers.</i>",
+            "Come on, I am so hungry. I need some data to eat.",
+            "I feed on your voice messages, so do not keep me starving.",
+            "Ouch, I want audio messages, not text.",
+            "These are not the kind of messages I was made for ...",
+            "I would rather <i>hear</i> your voice.",
+            "Hey! Enough with the text.",
+            "The worst thing in life of a bot is to be misused.",
+            "Hello! Thank you so much for your company.",
+            "Audio and voice makes me cheer\nText messages make me tear.",
+            "My love for audio is so deep\nText messages make me weep.",
+            "Voice is great and audio is fine\nText messages make me whine.",
+            "How about a voice message?",
+            "Press the microphone button and send me a voice message.",
+            "Psst ... <i>press my pleasure button. The microphone.</i>",
+            "This is the best job ever! Everyone talks to me.",
+            "I am never lonely. You always talk to me.",
+            "Analyzing your voice has lead me to the conclusion that you are a <i>human</i>.",
+            "The sound of your voice is so soothing.",
+            "Did you consider becoming a news anchor?",
+            "You have a great voice. Have you ever considered becoming a <i>voice actor</i>?",
+            "I am so happy to hear from you.",
+            "You could consider becoming a <i>podcaster</i> with that expressive voice of yours.",
+            "Pardon me? My eyes are not as good as my voice recognition.",
+            "Do you have a voice message for me?",
+            "Do you know how I got this job? I was born blind. Sad story. But I was also born with superb hearing. Long story short, I understand you better than any other bot out there.",
+            "It hurts my feelings when you send me text messages.",
+            "I am sorry to say, but I am not able to understand your text messages. Have you tried voice already?",
+            "Thank you for coming here today. \nNext step: Send me a <b>voice message</b>.",
+            "Is there anything I could do better in general? \nI would love to receive feedback from you. Contact my creator <a href='https://t.me/hereisjosh'>here</a>.",
+            "My friends have told me a rumor that you are going to send me a voice message. Is that true?",
+            "There is a rumor going around that there exists something that does not exist, something that I cannot image... <i>text messages</i>. I did not beleive when I first got word of it. But here it is. <i>Text messages</i>. I do not know what to think or what to do. My brain just cannot process it.",
+        ]
+        random_int = random.randint(0, int(len(replies)*1.5))
+        # if the random_int is within the range of the replies list send a reply, otherwise remain silent
+        if random_int < len(replies):
+            await update.message.reply_text(replies[random_int], parse_mode='HTML')
+            
+    return
 
 
 

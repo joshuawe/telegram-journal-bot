@@ -5,7 +5,7 @@ from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTyp
 
 import verbal_diary_bot as vdb
 from verbal_diary_bot import utils
-from verbal_diary_bot.telegram_handlers import voice, audio, register_handler, deregister_handler
+from verbal_diary_bot.telegram_handlers import voice, audio, register_handler, deregister_handler, echo
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -15,9 +15,8 @@ logging.basicConfig(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a your Verbal Diary Bot, please talk to me!")
     
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(update.message.text)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+# async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     await update.message.reply_text(update.message.text)
     
 async def caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text_caps = ' '.join(context.args).upper()
